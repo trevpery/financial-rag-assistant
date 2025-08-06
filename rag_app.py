@@ -69,9 +69,10 @@ if uploaded_files and "chunks" not in st.session_state:
         st.success("✅ Documents processed and indexed!")
 
 
-# --- Chat Input ---
+# Trigger chat section only after vector DB is ready
 if "vectordb" in st.session_state and st.session_state.vectordb:
     st.subheader("🔍 Ask a Question")
+
     user_query = st.chat_input("Ask a question about the documents...")
 
     if user_query:
@@ -85,11 +86,13 @@ if "vectordb" in st.session_state and st.session_state.vectordb:
             result = qa_chain(user_query)
             st.session_state.chat_history.append({"user": user_query, "bot": result['result']})
 
-# --- Display Chat History ---
-if st.session_state.chat_history:
+    # Display chat history
     for exchange in st.session_state.chat_history:
-        st.chat_message("user").write(exchange["user"])
-        st.chat_message("assistant").write(exchange["bot"])
+        with st.chat_message("user"):
+            st.write(exchange["user"])
+        with st.chat_message("assistant"):
+            st.write(exchange["bot"])
+
 
 # --- Summarization ---
 if st.session_state.vectordb:
