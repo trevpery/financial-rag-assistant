@@ -6,16 +6,19 @@ from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.chains.summarize import load_summarize_chain
 
-# Load API Key
-load_dotenv()
-openai_api_key = os.getenv("OPENAI_API_KEY")
+
+# Load API Key from Streamlit secrets
+openai_api_key = st.secrets.get("OPENAI_API_KEY")
+
 if not openai_api_key:
-    st.error("OPENAI_API_KEY not set. Please set it in .env or secrets.")
+    st.error("OPENAI_API_KEY not set. Please set it in .streamlit/secrets.toml.")
     st.stop()
+
+os.environ["OPENAI_API_KEY"] = openai_api_key
 
 # Streamlit UI
 st.set_page_config(page_title="📊 Financial Report RAG Assistant", layout="wide")
@@ -40,7 +43,7 @@ if uploaded_file is not None:
 
         # Embeddings & Vector DB
         embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
-        vectordb = Chroma.from_documents(chunks, embeddings, persist_directory="./db")
+        vectordb = FAISS.from_documents(chunks, embeddings)
         vectordb.persist()
 
         st.success("✅ PDF processed and indexed!")
