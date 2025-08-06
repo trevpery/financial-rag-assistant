@@ -13,12 +13,11 @@ from langchain.chains.summarize import load_summarize_chain
 
 
 # Load API Key from Streamlit secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-
-if not openai_api_key:
-    st.error("OPENAI_API_KEY not set. Please set it in .streamlit/secrets.toml.")
+if "OPENAI_API_KEY" not in st.secrets:
+    st.error("OPENAI_API_KEY not found in Streamlit secrets.")
     st.stop()
 
+openai_api_key = st.secrets["OPENAI_API_KEY"]
 os.environ["OPENAI_API_KEY"] = openai_api_key
 
 # Streamlit UI
