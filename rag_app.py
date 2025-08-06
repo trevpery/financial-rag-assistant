@@ -43,7 +43,7 @@ if "vectordb" not in st.session_state:
 # --- File Upload Section ---
 uploaded_files = st.file_uploader("Upload your financial documents (PDFs)", type=["pdf"], accept_multiple_files=True)
 
-if uploaded_files:
+if uploaded_files and "chunks" not in st.session_state:
     with st.spinner("📚 Processing PDFs..."):
         all_docs = []
         for uploaded_file in uploaded_files:
@@ -58,6 +58,9 @@ if uploaded_files:
         splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         chunks = splitter.split_documents(all_docs)
 
+        # Save chunks in session
+        st.session_state.chunks = chunks
+
         # Embedding and Vector DB
         embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=openai_api_key)
         vectordb = FAISS.from_documents(chunks, embeddings)
@@ -65,8 +68,9 @@ if uploaded_files:
 
         st.success("✅ Documents processed and indexed!")
 
+
 # --- Chat Input ---
-if st.session_state.vectordb:
+if "vectordb" in st.session_state and st.session_state.vectordb:
     st.subheader("🔍 Ask a Question")
     user_query = st.chat_input("Ask a question about the documents...")
 
