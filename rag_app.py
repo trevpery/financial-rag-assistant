@@ -2,6 +2,7 @@
 import os
 import tempfile
 import streamlit as st
+import openai
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -12,7 +13,7 @@ from langchain.chains.summarize import load_summarize_chain
 
 
 # Load API Key from Streamlit secrets
-openai_api_key = st.secrets.get("OPENAI_API_KEY")
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 if not openai_api_key:
     st.error("OPENAI_API_KEY not set. Please set it in .streamlit/secrets.toml.")
@@ -42,7 +43,7 @@ if uploaded_file is not None:
         chunks = splitter.split_documents(docs)
 
         # Embeddings & Vector DB
-        embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
+        embeddings = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
         vectordb = FAISS.from_documents(chunks, embeddings)
         vectordb.persist()
 
