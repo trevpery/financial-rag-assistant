@@ -3,7 +3,6 @@ import os
 import tempfile
 import streamlit as st
 import openai
-from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
@@ -18,7 +17,7 @@ if "OPENAI_API_KEY" not in st.secrets:
     st.stop()
 
 openai_api_key = st.secrets["OPENAI_API_KEY"]
-os.environ["OPENAI_API_KEY"] = openai_api_key
+
 
 # Streamlit UI
 st.set_page_config(page_title="📊 Financial Report RAG Assistant", layout="wide")
@@ -42,11 +41,16 @@ if uploaded_file is not None:
         chunks = splitter.split_documents(docs)
 
         # Embeddings & Vector DB
-        embeddings = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
+        embeddings = OpenAIEmbeddings(
+                  model="text-embedding-3-small",  # or "text-embedding-3-large"
+                  openai_api_key=openai_api_key
+        )
+
         vectordb = FAISS.from_documents(chunks, embeddings)
-        vectordb.persist()
 
         st.success("✅ PDF processed and indexed!")
+
+        os.environ["OPENAI_API_KEY"] = openai_api_key
 
         # Question interface
         st.subheader("🔍 Ask Questions")
