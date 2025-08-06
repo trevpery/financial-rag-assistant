@@ -42,7 +42,7 @@ if uploaded_file is not None:
 
         # Embeddings & Vector DB
         embeddings = OpenAIEmbeddings(
-                  model="text-embedding-3-small",  # or "text-embedding-3-large"
+                  model="text-embedding-ada-002",  # or "text-embedding-3-large"
                   openai_api_key=openai_api_key
         )
 
