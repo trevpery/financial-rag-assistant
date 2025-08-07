@@ -31,8 +31,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-st.title("📄 Financial Report RAG Assistant")
+st.markdown("<h4>📄 Financial Report RAG Assistant</h4>", unsafe_allow_html=True)
 st.markdown("Upload one or more financial documents and ask follow-up questions intelligently!")
 
 # --- Check API Key ---
