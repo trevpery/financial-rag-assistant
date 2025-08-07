@@ -25,7 +25,7 @@ logo_base64 = load_logo("static/TPC_Logo.png")
 st.markdown(
     f"""
     <div style='text-align: center; margin-bottom: 20px;'>
-        <img src='data:image/png;base64,{logo_base64}' width='200'/>
+        <img src='data:image/png;base64,{logo_base64}' width='400'/>
     </div>
     """,
     unsafe_allow_html=True
