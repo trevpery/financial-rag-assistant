@@ -13,7 +13,7 @@ from langchain.chains.summarize import load_summarize_chain
 from pathlib import Path
 
 # --- Streamlit Config ---
-st.set_page_config(page_title="📊 Financial Report RAG Assistant", layout="wide")
+st.set_page_config(page_title="Business Intelligence Assistant", layout="wide")
 
 # --- Logo ---
 def load_logo(path):
@@ -31,10 +31,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown("<h4>📄 Financial Report RAG Assistant</h4>", unsafe_allow_html=True)
+st.markdown("<h3>Business Intelligence Assistant</h3>", unsafe_allow_html=True)
 st.markdown("Upload one or more financial documents and ask follow-up questions intelligently!")
 
-# --- Check API Key ---
+# --- Check API Key --- - 1. # --- Streamlit Config ---
+st.set_page_config(page_title="Business Intelligence Assistant", layout="wide")
 if "OPENAI_API_KEY" not in st.secrets:
     st.error("❌ OPENAI_API_KEY not found in Streamlit secrets.")
     st.stop()
@@ -52,7 +53,7 @@ if "vectordb" not in st.session_state:
 uploaded_files = st.file_uploader("Upload your financial documents (PDFs)", type=["pdf"], accept_multiple_files=True)
 
 if uploaded_files and "chunks" not in st.session_state:
-    with st.spinner("📚 Processing PDFs..."):
+    with st.spinner("Processing PDFs..."):
         all_docs = []
         for uploaded_file in uploaded_files:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
@@ -74,17 +75,17 @@ if uploaded_files and "chunks" not in st.session_state:
         vectordb = FAISS.from_documents(chunks, embeddings)
         st.session_state.vectordb = vectordb
 
-        st.success("✅ Documents processed and indexed!")
+        st.success("Documents processed and indexed!")
 
 
 # Trigger chat section only after vector DB is ready
 if "vectordb" in st.session_state and st.session_state.vectordb:
-    st.subheader("🔍 Ask a Question")
+    st.subheader("Ask a Question")
 
     user_query = st.chat_input("Ask a question about the documents...")
 
     if user_query:
-        with st.spinner("🤖 Thinking..."):
+        with st.spinner("Thinking..."):
             llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
             qa_chain = RetrievalQA.from_chain_type(
                 llm=llm,
@@ -104,14 +105,14 @@ if "vectordb" in st.session_state and st.session_state.vectordb:
 
 # --- Summarization ---
 if st.session_state.vectordb:
-    st.subheader("📌 Generate Summary (Optional)")
+    st.subheader("Generate Summary (Optional)")
 
-    if st.button("📝 Generate Summary"):
+    if st.button("Generate Summary"):
         with st.spinner("Summarizing the document..."):
             llm = ChatOpenAI(openai_api_key=openai_api_key, temperature=0)
             # We need chunks again for summarization
             # This assumes you still have the latest chunks in session — if not, store them too
             summary_chain = load_summarize_chain(llm, chain_type="map_reduce")
             summary = summary_chain.run(st.session_state.vectordb.similarity_search("summary", k=50))
-            st.success("✅ Summary generated")
+            st.success("Summary generated")
             st.write(summary)
