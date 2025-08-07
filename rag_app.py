@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+import base64
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -9,19 +10,27 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.chains.summarize import load_summarize_chain
+from pathlib import Path
 
 # --- Streamlit Config ---
 st.set_page_config(page_title="📊 Financial Report RAG Assistant", layout="wide")
 
 # --- Logo ---
-#st.markdown(
-#    """
-#    <div style='text-align: center; margin-bottom: 20px;'>
-#        <img src='https://trevpery.com/logo.png' width='200'/>
-#    </div>
-#    """,
-#    unsafe_allow_html=True
-# )
+def load_logo(path):
+    with open(path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+logo_base64 = load_logo("static/TPC_Logo.png")
+st.markdown(
+    f"""
+    <div style='text-align: center; margin-bottom: 20px;'>
+        <img src='data:image/png;base64,{logo_base64}' width='200'/>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
 st.title("📄 Financial Report RAG Assistant")
 st.markdown("Upload one or more financial documents and ask follow-up questions intelligently!")
